@@ -96,6 +96,59 @@ public class Picture extends SimplePicture {
     }
 
     /**
+     * Method to set the red and green to 0, while keeping blue the same
+     */
+    public void keepOnlyBlue() {
+        Pixel[][] pixels = this.getPixels2D();
+        for (Pixel[] rowArray : pixels) {
+            for (Pixel pixelObj : rowArray) {
+                pixelObj.setRed(0);
+                pixelObj.setGreen(0);
+            }
+        }
+    }
+
+    /**
+     * Inverts the picture to make the lightest areas of the photo appear as the darkest and vice versa
+     */
+    public void negate() {
+        Pixel[][] pixels = this.getPixels2D();
+
+        for (Pixel[] rowArray : pixels) {
+            for (Pixel pixelObj : rowArray) {
+                Color color = pixelObj.getColor();
+
+                int negatedRed = 255 - color.getRed();
+                int negatedBlue = 255 - color.getBlue();
+                int negatedGreen = 255 - color.getGreen();
+
+                Color negated = new Color(negatedRed, negatedBlue, negatedGreen);
+                pixelObj.setColor(negated);
+            }
+        }
+    }
+
+    /**
+     * Makes the picture appear black and white
+     */
+    public void grayscale() {
+        Pixel[][] pixels = this.getPixels2D();
+
+        for (Pixel[] rowArray : pixels) {
+            for (Pixel pixel : rowArray) {
+                int red = pixel.getRed();
+                int green = pixel.getGreen();
+                int blue = pixel.getBlue();
+                int average = (red + green + blue) / 3;
+
+                pixel.setRed(average);
+                pixel.setGreen(average);
+                pixel.setBlue(average);
+            }
+        }
+    }
+
+    /**
      * Method that mirrors the picture around a
      * vertical mirror in the center of the picture
      * from left to right
@@ -134,9 +187,7 @@ public class Picture extends SimplePicture {
     }
 
     /**
-     * Method that mirrors the picture around a
-     * vertical mirror in the center of the picture
-     * from right to left
+     * Method that mirrors the picture around a horizontal mirror in the center of the picture from top to bottom
      */
     public void mirrorHorizontal() {
         Pixel[][] pixels = this.getPixels2D();
@@ -152,6 +203,9 @@ public class Picture extends SimplePicture {
         }
     }
 
+    /**
+     * Method that mirrors the picture around a horizontal mirror in the center of the picture from bottom to top
+     */
     public void mirrorHorizontalBotToTop() {
         Pixel[][] pixels = this.getPixels2D();
         Pixel topPixel = null;
@@ -181,6 +235,59 @@ public class Picture extends SimplePicture {
             // loop from 13 to just before the mirror point
             for (int col = 13; col < mirrorPoint; col++) {
 
+                count++;
+
+                leftPixel = pixels[row][col];
+                rightPixel = pixels[row]
+                        [mirrorPoint - col + mirrorPoint];
+                rightPixel.setColor(leftPixel.getColor());
+            }
+        }
+
+        System.out.println(count);
+    }
+
+    /**
+     * Mirrors the arms on the snowman to make a snowman with 4 arms.
+     */
+    public void mirrorArms() {
+        int mirrorPoint = 190;
+
+        Pixel topPixel = null;
+        Pixel bottomPixel = null;
+
+        Pixel[][] pixels = this.getPixels2D();
+
+        for (int row = 160; row < mirrorPoint; row++){
+            for (int col = 50; col < 170; col++) {
+                topPixel = pixels[row][col];
+                bottomPixel = pixels[mirrorPoint - row + mirrorPoint][col];
+                bottomPixel.setColor(topPixel.getColor());
+            }
+        }
+
+        for (int row = 160; row < mirrorPoint; row++){
+            for (int col = 239; col < 300; col++) {
+                topPixel = pixels[row][col];
+                bottomPixel = pixels[mirrorPoint - row + mirrorPoint][col];
+                bottomPixel.setColor(topPixel.getColor());
+            }
+        }
+    }
+
+    /**
+     * Mirrors the seagull to the right so that there are two seagulls on the beach near each other.
+     */
+    public void mirrorGull() {
+        int mirrorPoint = 350;
+        Pixel leftPixel = null;
+        Pixel rightPixel = null;
+
+        Pixel[][] pixels = this.getPixels2D();
+
+        for (int row = 230; row < 330; row++) {
+            for (int col = 230; col < mirrorPoint; col++) {
+
                 leftPixel = pixels[row][col];
                 rightPixel = pixels[row]
                         [mirrorPoint - col + mirrorPoint];
@@ -188,7 +295,6 @@ public class Picture extends SimplePicture {
             }
         }
     }
-
 
     /**
      * Method to show large changes in color
@@ -215,10 +321,82 @@ public class Picture extends SimplePicture {
         }
     }
 
-
-    /* Main method for testing - each class in Java can have a main
-     * method
+    /**
+     * Copies a portion of a source pictore to the specified location in the detination picture.
+     * @param sourcePicture the picture to copy from
+     * @param startSourceRow the starting row of the section to copy
+     * @param endSourceRow the ending row of the section to copy
+     * @param startSourceCol the starting column of the section to copy
+     * @param endSourceCol the ending column of the section to copy
+     * @param startDestRow the row to start copying to
+     * @param startDestCol the column to start copying to
      */
+    public void cropAndCopy(Picture sourcePicture, int startSourceRow, int endSourceRow, int startSourceCol, int endSourceCol, int startDestRow, int startDestCol) {
+        Pixel[][] sourcePixels = sourcePicture.getPixels2D();
+        Pixel[][] destPixels = this.getPixels2D();
+
+        int rowDelta = startDestRow - startSourceRow;
+        int colDelta = startDestCol - startSourceCol;
+
+        for (int row = startSourceRow; row < endSourceRow; row++) {
+            for (int col = startSourceCol; col < endSourceCol; col++) {
+                destPixels[row + rowDelta][col + colDelta].setColor(sourcePixels[row][col].getColor());
+            }
+        }
+
+    }
+
+    /**
+     * Scales the picture to half the original size and returns the scaled picture
+     * @return a scaled copy of the picture
+     */
+    public Picture scaleByHalf() {
+
+        Pixel[][] pixels = this.getPixels2D();
+
+        int width = pixels[0].length;
+        int height = pixels.length;
+
+        Picture returnPic = new Picture(height / 2, width / 2);
+        Pixel[][] returnPixels = returnPic.getPixels2D();
+
+        for (int row = 0; row < returnPixels.length; row++) {
+            for (int col = 0; col < returnPixels[0].length; col++) {
+                returnPixels[row][col].setColor(pixels[row * 2][col * 2].getColor());
+            }
+        }
+
+        return returnPic;
+    }
+
+    /**
+     * Scales the picture to the specified width and height and returns the scaled picture
+     * @param height the height to scale to
+     * @param width the width to scale to
+     * @return the scaled image
+     */
+    public Picture scaleToSize(int height, int width) {
+
+        Pixel[][] pixels = this.getPixels2D();
+
+        int originalWidth = pixels[0].length;
+        int originalHeight = pixels.length;
+
+        double rowFactor = 1.0 * pixels.length / height;
+        double colFactor = 1.0 * pixels[0].length / width;
+
+        Picture returnPic = new Picture(height, width);
+        Pixel[][] returnPixels = returnPic.getPixels2D();
+
+        for (int row = 0; row < returnPixels.length; row++) {
+            for (int col = 0; col < returnPixels[0].length; col++) {
+                returnPixels[row][col].setColor(pixels[(int)(row * rowFactor)][(int)(col * colFactor)].getColor());
+            }
+        }
+
+        return returnPic;
+    }
+
     public static void main(String[] args) {
         Picture beach = new Picture("water.jpg");
         beach.explore();
@@ -226,4 +404,4 @@ public class Picture extends SimplePicture {
         beach.explore();
     }
 
-} // this } is the end of class Picture, put all new methods before this
+}
