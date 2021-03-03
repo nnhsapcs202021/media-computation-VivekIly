@@ -14,6 +14,7 @@ import java.util.List; // resolves problem with java.awt.List and java.util.List
  * @author Barbara Ericson ericson@cc.gatech.edu
  */
 public class Picture extends SimplePicture {
+
     ///////////////////// constructors //////////////////////////////////
 
     /**
@@ -258,7 +259,7 @@ public class Picture extends SimplePicture {
 
         Pixel[][] pixels = this.getPixels2D();
 
-        for (int row = 160; row < mirrorPoint; row++){
+        for (int row = 160; row < mirrorPoint; row++) {
             for (int col = 50; col < 170; col++) {
                 topPixel = pixels[row][col];
                 bottomPixel = pixels[mirrorPoint - row + mirrorPoint][col];
@@ -266,7 +267,7 @@ public class Picture extends SimplePicture {
             }
         }
 
-        for (int row = 160; row < mirrorPoint; row++){
+        for (int row = 160; row < mirrorPoint; row++) {
             for (int col = 239; col < 300; col++) {
                 topPixel = pixels[row][col];
                 bottomPixel = pixels[mirrorPoint - row + mirrorPoint][col];
@@ -312,24 +313,22 @@ public class Picture extends SimplePicture {
                 leftPixel = pixels[row][col];
                 rightPixel = pixels[row][col + 1];
                 rightColor = rightPixel.getColor();
-                if (leftPixel.colorDistance(rightColor) >
-                        edgeDist)
-                    leftPixel.setColor(Color.BLACK);
-                else
-                    leftPixel.setColor(Color.WHITE);
+                if (leftPixel.colorDistance(rightColor) > edgeDist) leftPixel.setColor(Color.BLACK);
+                else leftPixel.setColor(Color.WHITE);
             }
         }
     }
 
     /**
      * Copies a portion of a source pictore to the specified location in the detination picture.
-     * @param sourcePicture the picture to copy from
+     *
+     * @param sourcePicture  the picture to copy from
      * @param startSourceRow the starting row of the section to copy
-     * @param endSourceRow the ending row of the section to copy
+     * @param endSourceRow   the ending row of the section to copy
      * @param startSourceCol the starting column of the section to copy
-     * @param endSourceCol the ending column of the section to copy
-     * @param startDestRow the row to start copying to
-     * @param startDestCol the column to start copying to
+     * @param endSourceCol   the ending column of the section to copy
+     * @param startDestRow   the row to start copying to
+     * @param startDestCol   the column to start copying to
      */
     public void cropAndCopy(Picture sourcePicture, int startSourceRow, int endSourceRow, int startSourceCol, int endSourceCol, int startDestRow, int startDestCol) {
         Pixel[][] sourcePixels = sourcePicture.getPixels2D();
@@ -347,7 +346,31 @@ public class Picture extends SimplePicture {
     }
 
     /**
+     * Crops the image.
+     * @param startRow the starting row
+     * @param startCol the starting column
+     * @param endRow the ending row
+     * @param endCol the ending column
+     * @return the cropped image
+     */
+    public Picture crop(int startRow, int startCol, int endRow, int endCol) {
+        Picture returnPic = new Picture(endRow - startRow, endCol - startCol);
+
+        Pixel[][] pixels = this.getPixels2D();
+        Pixel[][] returnPixels = returnPic.getPixels2D();
+
+        for (int row = 0; row < returnPixels.length; row++) {
+            for (int col = 0; col < returnPixels[0].length; col++) {
+                returnPixels[row][col].setColor(pixels[row + startRow][col + startCol].getColor());
+            }
+        }
+
+        return returnPic;
+    }
+
+    /**
      * Scales the picture to half the original size and returns the scaled picture
+     *
      * @return a scaled copy of the picture
      */
     public Picture scaleByHalf() {
@@ -371,8 +394,9 @@ public class Picture extends SimplePicture {
 
     /**
      * Scales the picture to the specified width and height and returns the scaled picture
+     *
      * @param height the height to scale to
-     * @param width the width to scale to
+     * @param width  the width to scale to
      * @return the scaled image
      */
     public Picture scaleToSize(int height, int width) {
@@ -390,11 +414,134 @@ public class Picture extends SimplePicture {
 
         for (int row = 0; row < returnPixels.length; row++) {
             for (int col = 0; col < returnPixels[0].length; col++) {
-                returnPixels[row][col].setColor(pixels[(int)(row * rowFactor)][(int)(col * colFactor)].getColor());
+                returnPixels[row][col].setColor(pixels[(int) (row * rowFactor)][(int) (col * colFactor)].getColor());
             }
         }
 
         return returnPic;
+    }
+
+    /**
+     * Slices the picture about an offset diagonal and scrapes the pixels along that diagonal to the right side of the image.
+     * @return the sliced image.
+     */
+    public Picture slice() {
+        Pixel[][] pixels = this.getPixels2D();
+
+        /*for (int row = 218; row < 1037; row++) {
+            for (int col = 720; col < 1335; col++) {
+                pixels[row][col].setColor(Color.WHITE);
+            }
+        }*/
+
+        Picture returnPic = new Picture(pixels.length, pixels[0].length);
+        Pixel[][] returnPixels = returnPic.getPixels2D();
+
+        for (int row = 0; row < pixels.length; row++) {
+            for (int col = 0; col < pixels[0].length; col++) {
+                if (col > 0 && col > 0.746583850932 * row + 0.25 * pixels[0].length) {
+                    returnPixels[row][col].setColor(returnPixels[row][col - 1].getColor());
+                } else {
+                    returnPixels[row][col].setColor(pixels[row][col].getColor());
+                }
+            }
+        }
+        return returnPic;
+    }
+
+    /**
+     * Creates a 3D glasses effect.
+     * @param offset the number of pixels to offset the red and blue counterparts.
+     * @return the modified image.
+     */
+    public Picture rgbEffect(int offset) {
+        Picture red = new Picture(this);
+        Picture blue = new Picture(this);
+
+        Pixel[][] redP = red.getPixels2D();
+        Pixel[][] blueP = blue.getPixels2D();
+
+        for (Pixel[] row : redP) {
+            for (Pixel pix : row) {
+                int average = (pix.getRed() + pix.getGreen() + pix.getBlue()) / 3;
+
+                if (average < 150) {
+                    pix.setRed((pix.getRed() + 210) / 2);
+                    pix.setGreen((pix.getGreen() + 9) / 2);
+                    pix.setBlue((pix.getBlue() + 12) / 2);
+                    pix.setAlpha(50);
+                }
+            }
+        }
+
+        for (Pixel[] row : blueP) {
+            for (Pixel pix : row) {
+                int average = (pix.getRed() + pix.getGreen() + pix.getBlue()) / 3;
+
+                if (average < 150) {
+                    pix.setRed((pix.getRed() + 30) / 2);
+                    pix.setGreen((pix.getGreen() + 208) / 2);
+                    pix.setBlue((pix.getBlue() + 255) / 2);
+                    pix.setAlpha(50);
+                }
+            }
+        }
+
+        Pixel[][] pixels = this.getPixels2D();
+
+        Picture returnPic = new Picture(pixels.length, pixels[0].length);
+        Pixel[][] returnPix = returnPic.getPixels2D();
+
+        for (int row = 0; row < pixels.length; row++) {
+            for (int col = 0; col < pixels[0].length; col++) {
+                if (col > offset - 1) {
+                    returnPix[row][col].setRed((redP[row][col - offset].getRed() + blueP[row][col].getRed() + pixels[row][col].getRed()) / 3);
+                    returnPix[row][col].setGreen((redP[row][col - offset].getGreen() + blueP[row][col].getGreen() + pixels[row][col].getGreen()) / 3);
+                    returnPix[row][col].setBlue((redP[row][col - offset].getBlue() + blueP[row][col].getBlue() + pixels[row][col].getBlue()) / 3);
+                }
+            }
+        }
+
+        return returnPic;
+    }
+
+    /**
+     * Creates a collage of four pictures
+     *
+     * @param picture1 the first picture
+     * @param picture2 the second picture
+     * @param picture3 the third picture
+     * @param picture4 the fourth picture
+     */
+    public static Picture createCollage4(Picture picture1, Picture picture2, Picture picture3, Picture picture4) {
+        Pixel[][] pixels1 = picture1.getPixels2D();
+        Pixel[][] pixels2 = picture2.getPixels2D();
+        Pixel[][] pixels3 = picture3.getPixels2D();
+        Pixel[][] pixels4 = picture4.getPixels2D();
+
+        int width1 = pixels1[0].length;
+        int height1 = pixels1.length;
+
+        int width2 = pixels2[0].length;
+        int height2 = pixels2.length;
+
+        int width3 = pixels3[0].length;
+        int height3 = pixels3.length;
+
+        int width4 = pixels4[0].length;
+        int height4 = pixels4.length;
+
+        int canvasWidth = width1 * 2;
+        int canvasHeight = height1 * 2;
+
+        Picture canvas = new Picture(canvasHeight, canvasWidth);
+
+        canvas.cropAndCopy(picture1, 0, pixels1.length, 0, pixels1[0].length, 0, 0);
+        canvas.cropAndCopy(picture2, 0, pixels2.length, 0, pixels2[0].length, 0, pixels1[0].length);
+        canvas.cropAndCopy(picture3, 0, pixels3.length, 0, pixels3[0].length, pixels1.length, 0);
+        canvas.cropAndCopy(picture4, 0, pixels4.length, 0, pixels4[0].length, pixels2.length, pixels3[0].length);
+
+        return canvas;
     }
 
     public static void main(String[] args) {

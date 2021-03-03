@@ -1,3 +1,5 @@
+import java.util.Scanner;
+
 /**
  * This class contains class (static) methods
  * that will help you test the Picture class
@@ -30,7 +32,7 @@ public class PictureTester {
     /**
      * Method to test negate
      */
-    public static void testNegate(){
+    public static void testNegate() {
         Picture beach = new Picture("beach.jpg");
         beach.explore();
         beach.negate();
@@ -40,7 +42,7 @@ public class PictureTester {
     /**
      * Method to test grayscale
      */
-    public static void testGrayscale(){
+    public static void testGrayscale() {
         Picture beach = new Picture("beach.jpg");
         beach.explore();
         beach.grayscale();
@@ -88,6 +90,9 @@ public class PictureTester {
         caterpillar.explore();
     }
 
+    /**
+     * Method to test mirrorVerticalRightToLeft
+     */
     public static void testMirrorVerticalRightToLeft() {
         Picture pic = new Picture("beach.jpg");
         pic.explore();
@@ -95,6 +100,9 @@ public class PictureTester {
         pic.explore();
     }
 
+    /**
+     * Method to test mirrorHorizontal
+     */
     public static void testMirrorHorizontal() {
         Picture pic = new Picture("beach.jpg");
         pic.explore();
@@ -102,6 +110,9 @@ public class PictureTester {
         pic.explore();
     }
 
+    /**
+     * Method to test mirrorHorizontalBotToTop
+     */
     public static void testMirrorHorizontalBotToTop(String filepath) {
         Picture pic = new Picture(filepath);
         pic.explore();
@@ -119,6 +130,9 @@ public class PictureTester {
         temple.explore();
     }
 
+    /**
+     * Method to test mirrorArms
+     */
     public static void testMirrorArms() {
         Picture temple = new Picture("snowman.jpg");
         temple.explore();
@@ -126,6 +140,9 @@ public class PictureTester {
         temple.explore();
     }
 
+    /**
+     * Method to test mirrorGull
+     */
     public static void testMirrorGull() {
         Picture temple = new Picture("seagull.jpg");
         temple.explore();
@@ -134,12 +151,85 @@ public class PictureTester {
     }
 
     /**
+     * Method to test crop
+     */
+    public static void testCrop() {
+        Picture pic1 = new Picture("Iphone_camera_app.jpg");
+        pic1 = pic1.scaleToSize(716, 955);
+
+        pic1.explore();
+        pic1 = pic1.crop(0, 310, 716, 670);
+        pic1.explore();
+    }
+
+    /**
+     * Method to test slice
+     */
+    public static void testSlice() {
+        Picture pic = new Picture("Iphone_camera_app.jpg");
+        Picture pic1 = pic.slice();
+        pic1.explore();
+    }
+
+    /**
+     * Method to test rgbEffect
+     */
+    public static void testRGBEffect() {
+        Picture pic = new Picture("arch.jpg");
+        pic = pic.rgbEffect(10);
+        pic.explore();
+    }
+
+    /**
+     * Method to create collage by calling createCollage4 method from Picture class.
+     */
+    public static void createCollage() {
+        Picture pic1 = new Picture("Iphone_camera_app.jpg");
+        Picture pic2 = new Picture("Iphone_camera_app.jpg");
+        Picture pic3 = new Picture("Iphone_camera_app.jpg");
+        Picture pic4 = new Picture("Iphone_camera_app.jpg");
+
+        pic3 = pic3.rgbEffect(15);
+
+        pic1 = pic1.scaleToSize(716, 955);
+        pic2 = pic2.scaleToSize(716, 955);
+        pic3 = pic3.scaleToSize(716, 955);
+        pic4 = pic4.scaleToSize(716, 955);
+
+        pic1 = pic1.crop(0, 208, 716, 747);
+        pic2 = pic2.crop(0, 208, 716, 747);
+        pic3 = pic3.crop(0, 208, 716, 747);
+        pic4 = pic4.crop(0, 208, 716, 747);
+
+        // recursive
+        Picture subpic2 = pic2.scaleToSize(390, 293);
+        pic2.cropAndCopy(subpic2, 0, 390, 0, 293, 104, 135);
+        for (int i = 0; i < 500; i++) {
+            subpic2 = pic2;
+            subpic2 = pic2.scaleToSize(390, 293);
+            pic2.cropAndCopy(subpic2, 0, 390, 0, 293, 104, 135);
+        }
+
+        pic4 = pic4.slice();
+
+        Picture collage = Picture.createCollage4(pic1, pic2, pic3, pic4);
+        collage.explore();
+
+        System.out.print("Enter the filepath to save the collage to: ");
+
+        Scanner scan = new Scanner(System.in);
+        String filepath = scan.nextLine();
+
+        collage.write(filepath + "\\collage.jpg");
+    }
+
+    /**
      * Method to test edgeDetection
      */
     public static void testEdgeDetection() {
-        Picture swan = new Picture("swan.jpg");
-        swan.edgeDetection(10);
-        swan.explore();
+        Picture pic = new Picture("Iphone_camera_app.jpg");
+        pic.edgeDetection(15);
+        pic.explore();
     }
 
     /**
@@ -147,10 +237,11 @@ public class PictureTester {
      * method in Java
      */
     public static void main(String[] args) {
-        String filepath = "C:\\Users\\Vivek\\Downloads\\deep-tunnel-5110033.jpg";
         // uncomment a call here to run a test
         // and comment out the ones you don't want
         // to run
+        /*Picture pic = new Picture("Iphone_camera_app.jpg");
+        pic.explore();*/
         //testZeroBlue();
         //testKeepOnlyBlue();
         //testKeepOnlyRed();
@@ -167,9 +258,12 @@ public class PictureTester {
         //testMirrorHorizontalBotToTop(filepath);
         //testMirrorTemple();
         //testMirrorArms();
-        testMirrorGull();
+        //testMirrorGull();
         //testMirrorDiagonal();
-        //testCollage();
+        //testCrop();
+        //testSlice();
+        //testRGBEffect();
+        createCollage();
         //testCopy();
         //testEdgeDetection();
         //testEdgeDetection2();
