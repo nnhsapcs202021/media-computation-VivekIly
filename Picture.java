@@ -347,10 +347,11 @@ public class Picture extends SimplePicture {
 
     /**
      * Crops the image.
+     *
      * @param startRow the starting row
      * @param startCol the starting column
-     * @param endRow the ending row
-     * @param endCol the ending column
+     * @param endRow   the ending row
+     * @param endCol   the ending column
      * @return the cropped image
      */
     public Picture crop(int startRow, int startCol, int endRow, int endCol) {
@@ -423,16 +424,17 @@ public class Picture extends SimplePicture {
 
     /**
      * Slices the picture about an offset diagonal and scrapes the pixels along that diagonal to the right side of the image.
+     *
      * @return the sliced image.
      */
     public Picture slice() {
         Pixel[][] pixels = this.getPixels2D();
 
-        /*for (int row = 218; row < 1037; row++) {
-            for (int col = 720; col < 1335; col++) {
-                pixels[row][col].setColor(Color.WHITE);
-            }
-        }*/
+       /*for (int row = 218; row < 1037; row++) {
+           for (int col = 720; col < 1335; col++) {
+               pixels[row][col].setColor(Color.WHITE);
+           }
+       }*/
 
         Picture returnPic = new Picture(pixels.length, pixels[0].length);
         Pixel[][] returnPixels = returnPic.getPixels2D();
@@ -451,6 +453,7 @@ public class Picture extends SimplePicture {
 
     /**
      * Creates a 3D glasses effect.
+     *
      * @param offset the number of pixels to offset the red and blue counterparts.
      * @return the modified image.
      */
@@ -469,7 +472,7 @@ public class Picture extends SimplePicture {
                     pix.setRed((pix.getRed() + 210) / 2);
                     pix.setGreen((pix.getGreen() + 9) / 2);
                     pix.setBlue((pix.getBlue() + 12) / 2);
-                    pix.setAlpha(50);
+                    //pix.setAlpha(50);
                 }
             }
         }
@@ -482,7 +485,7 @@ public class Picture extends SimplePicture {
                     pix.setRed((pix.getRed() + 30) / 2);
                     pix.setGreen((pix.getGreen() + 208) / 2);
                     pix.setBlue((pix.getBlue() + 255) / 2);
-                    pix.setAlpha(50);
+                    //pix.setAlpha(50);
                 }
             }
         }
@@ -494,10 +497,40 @@ public class Picture extends SimplePicture {
 
         for (int row = 0; row < pixels.length; row++) {
             for (int col = 0; col < pixels[0].length; col++) {
-                if (col > offset - 1) {
-                    returnPix[row][col].setRed((redP[row][col - offset].getRed() + blueP[row][col].getRed() + pixels[row][col].getRed()) / 3);
-                    returnPix[row][col].setGreen((redP[row][col - offset].getGreen() + blueP[row][col].getGreen() + pixels[row][col].getGreen()) / 3);
-                    returnPix[row][col].setBlue((redP[row][col - offset].getBlue() + blueP[row][col].getBlue() + pixels[row][col].getBlue()) / 3);
+                if (col > offset - 1 && col < returnPix[0].length - offset) {
+                    returnPix[row][col].setRed((redP[row][col - offset].getRed() + blueP[row][col + offset].getRed() + pixels[row][col].getRed()) / 3);
+                    returnPix[row][col].setGreen((redP[row][col - offset].getGreen() + blueP[row][col + offset].getGreen() + pixels[row][col].getGreen()) / 3);
+                    returnPix[row][col].setBlue((redP[row][col - offset].getBlue() + blueP[row][col + offset].getBlue() + pixels[row][col].getBlue()) / 3);
+                }
+            }
+        }
+
+        return returnPic;
+    }
+
+    /**
+     * Rotates the picture.
+     * @param degrees the amount of rotation.
+     * @return the rotated picture.
+     */
+    public Picture rotate(double degrees) {
+        Pixel[][] pixels = this.getPixels2D();
+
+        Picture returnPic = new Picture(pixels.length, pixels[0].length);
+        Pixel[][] returnPix = returnPic.getPixels2D();
+
+        int numOfPixels = returnPix.length * returnPix[0].length;
+
+        int centerX = pixels[0].length / 2;
+        int centerY = pixels.length / 2;
+
+        for (int row = 0; row < returnPix.length; row++) {
+            for (int col = 0; col < returnPix[0].length; col++) {
+                double newX = (col - centerX) * Math.cos(degrees) - (row - centerY) * Math.sin(degrees) + centerX;
+                double newY = (col - centerX) * Math.sin(degrees) + (row - centerY) * Math.cos(degrees) + centerY;
+
+                if (-1 < (int) (Math.round(newX)) && (int) (Math.round(newX)) < returnPix[0].length && -1 < (int) (Math.round(newY)) && (int) (Math.round(newY)) < returnPix.length) {
+                    returnPix[(int) (Math.round(newY))][(int) (Math.round(newX))].setColor(pixels[row][col].getColor());
                 }
             }
         }
@@ -513,7 +546,7 @@ public class Picture extends SimplePicture {
      * @param picture3 the third picture
      * @param picture4 the fourth picture
      */
-    public static Picture createCollage4(Picture picture1, Picture picture2, Picture picture3, Picture picture4) {
+    public static Picture createCollage(Picture picture1, Picture picture2, Picture picture3, Picture picture4) {
         Pixel[][] pixels1 = picture1.getPixels2D();
         Pixel[][] pixels2 = picture2.getPixels2D();
         Pixel[][] pixels3 = picture3.getPixels2D();
