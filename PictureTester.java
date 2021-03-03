@@ -189,7 +189,7 @@ public class PictureTester {
         Picture pic3 = new Picture("Iphone_camera_app.jpg");
         Picture pic4 = new Picture("Iphone_camera_app.jpg");
 
-        pic3 = pic3.rgbEffect(15);
+        pic3 = pic3.rgbEffect(35);
 
         pic1 = pic1.scaleToSize(716, 955);
         pic2 = pic2.scaleToSize(716, 955);
