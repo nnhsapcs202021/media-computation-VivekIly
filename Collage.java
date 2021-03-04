@@ -12,7 +12,7 @@ public class Collage {
         pic.cropAndCopy(subpic, 0, 390, 0, 293, 104, 135);
         for (int i = 0; i < 50; i++) {
             subpic = pic.scaleToSize(390, 293);
-            subpic = subpic.rotate(0.2);
+            //subpic = subpic.rotate(0.2);
             pic.cropAndCopy(subpic, 0, 390, 0, 293, 104, 135);
         }
     }
@@ -28,13 +28,13 @@ public class Collage {
 
         System.out.println("Creating rgbEffect...");
         long startRGB = System.currentTimeMillis();
-        pic3 = pic3.rotate(0.1);
-        pic3 = pic3.rgbEffect(15);
+        //pic3 = pic3.rotate(0.05);
+        pic3 = pic3.rgbEffect(27);
         long endRGB = System.currentTimeMillis();
         System.out.println("rgbEffect created in " + 1.0 * (endRGB - startRGB) / 1000 + " milliseconds.");
-        pic3.explore();
+        //pic3.explore();
 
-        Thread.sleep(Integer.MAX_VALUE);
+        //Thread.sleep(Integer.MAX_VALUE);
 
         System.out.println("Scaling and cropping pictures...");
         long startScale = System.currentTimeMillis();

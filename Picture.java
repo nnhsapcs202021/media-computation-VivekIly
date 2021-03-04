@@ -430,12 +430,6 @@ public class Picture extends SimplePicture {
     public Picture slice() {
         Pixel[][] pixels = this.getPixels2D();
 
-       /*for (int row = 218; row < 1037; row++) {
-           for (int col = 720; col < 1335; col++) {
-               pixels[row][col].setColor(Color.WHITE);
-           }
-       }*/
-
         Picture returnPic = new Picture(pixels.length, pixels[0].length);
         Pixel[][] returnPixels = returnPic.getPixels2D();
 
@@ -448,7 +442,92 @@ public class Picture extends SimplePicture {
                 }
             }
         }
+
         return returnPic;
+    }
+
+    /**
+     * Creates a glitch effect by shifting pixels to the right or left.
+     *
+     * @param p the picture to modify.
+     * @return the modified picture.
+     */
+    public Picture glitchEffect(Picture p) {
+        Pixel[][] pixels = p.getPixels2D();
+
+        for (int row = 140; row < 180; row++) {
+            int offset = 20;
+
+            for (int col = 0; col < pixels[0].length; col++) {
+                if (col < pixels[0].length - offset)
+                    pixels[row][col].setColor(pixels[row][col + offset].getColor());
+            }
+        }
+
+        for (int row = 185; row < 195; row++) {
+            int offset = 20;
+
+            for (int col = 0; col < pixels[0].length; col++) {
+                if (col < pixels[0].length - offset)
+                    pixels[row][col].setColor(pixels[row][col + offset].getColor());
+            }
+        }
+
+        int offset = 0;
+        for (int row = 300; row < 320; row++) {
+
+            for (int col = 0; col < pixels[0].length; col++) {
+                if (col < pixels[0].length - offset)
+                    pixels[row][col].setColor(pixels[row][col + offset].getColor());
+            }
+
+            offset++;
+        }
+
+        offset = 0;
+        for (int row = 750; row < 900; row++) {
+
+            for (int col = pixels[0].length - 1; col > -1; col--) {
+                if (col - offset < pixels[0].length && col - offset > -1)
+                    pixels[row][col].setColor(pixels[row][col - offset].getColor());
+            }
+
+            if (row % 2 == 0)
+                offset++;
+        }
+
+        for (int row = 750; row < 900; row++) {
+            offset = 37;
+
+            for (int col = 0; col < pixels[0].length; col++) {
+                if (col < pixels[0].length - offset)
+                    pixels[row][col].setColor(pixels[row][col + offset].getColor());
+            }
+        }
+
+        offset = 0;
+        for (int row = 1200; row < 1220; row++) {
+
+            for (int col = pixels[0].length - 1; col > -1; col--) {
+                if (col - offset < pixels[0].length && col - offset > -1)
+                    pixels[row][col].setColor(pixels[row][col - offset].getColor());
+            }
+
+            offset++;
+        }
+
+        offset = 20;
+        for (int row = 1220; row < 1240; row++) {
+
+            for (int col = 0; col < pixels[0].length; col++) {
+                if (col < pixels[0].length - offset)
+                    pixels[row][col].setColor(pixels[row][col + offset].getColor());
+            }
+
+            offset--;
+        }
+
+        return p;
     }
 
     /**
@@ -505,11 +584,12 @@ public class Picture extends SimplePicture {
             }
         }
 
-        return returnPic;
+        return glitchEffect(returnPic);
     }
 
     /**
      * Rotates the picture.
+     *
      * @param degrees the amount of rotation.
      * @return the rotated picture.
      */
@@ -528,6 +608,8 @@ public class Picture extends SimplePicture {
             for (int col = 0; col < returnPix[0].length; col++) {
                 double newX = (col - centerX) * Math.cos(degrees) - (row - centerY) * Math.sin(degrees) + centerX;
                 double newY = (col - centerX) * Math.sin(degrees) + (row - centerY) * Math.cos(degrees) + centerY;
+
+                //System.out.println("Start: " + col + ", " + row + "; End: " + newX + ", " + newY);
 
                 if (-1 < (int) (Math.round(newX)) && (int) (Math.round(newX)) < returnPix[0].length && -1 < (int) (Math.round(newY)) && (int) (Math.round(newY)) < returnPix.length) {
                     returnPix[(int) (Math.round(newY))][(int) (Math.round(newX))].setColor(pixels[row][col].getColor());
