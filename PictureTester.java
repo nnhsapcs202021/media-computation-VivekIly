@@ -233,7 +233,7 @@ public class PictureTester {
         //testCrop();
         //testSlice();
         //testRGBEffect();
-        //testRotate();
+        testRotate();
         //testCopy();
         //testEdgeDetection();
         //testEdgeDetection2();

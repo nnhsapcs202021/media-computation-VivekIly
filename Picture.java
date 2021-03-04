@@ -421,7 +421,7 @@ public class Picture extends SimplePicture {
 
         return returnPic;
     }
-
+    
     /**
      * Slices the picture about an offset diagonal and scrapes the pixels along that diagonal to the right side of the image.
      *
@@ -611,8 +611,16 @@ public class Picture extends SimplePicture {
 
                 //System.out.println("Start: " + col + ", " + row + "; End: " + newX + ", " + newY);
 
-                if (-1 < (int) (Math.round(newX)) && (int) (Math.round(newX)) < returnPix[0].length && -1 < (int) (Math.round(newY)) && (int) (Math.round(newY)) < returnPix.length) {
-                    returnPix[(int) (Math.round(newY))][(int) (Math.round(newX))].setColor(pixels[row][col].getColor());
+                if (-1 < (int) (newX) && (int) (newX) < returnPix[0].length && -1 < (int) (newY) && (int) (newY) < returnPix.length) {
+                    returnPix[(int) (newY)][(int) (newX)].setColor(pixels[row][col].getColor());
+                }
+            }
+        }
+
+        for (Pixel[] pix : returnPix) {
+            for (int col = 0; col < returnPix[0].length; col++) {
+                if (pix[col].getColor().equals(Color.WHITE) && col < returnPix[0].length - 1) {
+                    pix[col].setColor(pix[col + 1].getColor());
                 }
             }
         }
