@@ -421,7 +421,37 @@ public class Picture extends SimplePicture {
 
         return returnPic;
     }
-    
+
+    public Picture waves(Picture p) {
+        Pixel[][] pixels = p.getPixels2D();
+        Pixel[][] pixelsCopy = new Pixel[pixels.length][pixels[0].length];
+
+        for (int i = 0; i < pixels.length; i++) {
+            System.arraycopy(pixels[i], 0, pixelsCopy[i], 0, pixels[0].length);
+        }
+
+        for (int row = 0; row < pixels.length; row++) {
+            for (int col = 0; col < pixels[0].length; col++) {
+                double sin = Math.sin(0.1 * col + 0.6) * 5;
+
+                if (sin > 0 && row + sin < pixels.length && row + sin > -1 && col > 0.746583850932 * row + 0.25 * pixels[0].length)
+                    pixels[row][col].setColor(pixelsCopy[(int)(row + sin)][col].getColor());
+            }
+        }
+
+        for (int row = pixels.length; row > -1; row--) {
+            for (int col = 0; col < pixels[0].length; col++) {
+                double sin = Math.sin(0.1 * col + 0.6) * 5;
+
+                if (sin <= 0 && row + sin < pixels.length && row + sin > -1 && col > 0.746583850932 * row + 0.25 * pixels[0].length)
+                    pixels[row][col].setColor(pixelsCopy[(int)(row + sin)][col].getColor());
+            }
+        }
+
+
+        return p;
+    }
+
     /**
      * Slices the picture about an offset diagonal and scrapes the pixels along that diagonal to the right side of the image.
      *
@@ -443,7 +473,7 @@ public class Picture extends SimplePicture {
             }
         }
 
-        return returnPic;
+        return waves(returnPic);
     }
 
     /**

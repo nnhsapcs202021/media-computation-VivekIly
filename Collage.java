@@ -5,6 +5,7 @@ public class Collage {
 
     /**
      * Used in main method to create the rotated recursive image.
+     *
      * @param pic the picture to modify.
      */
     public static void createRecursive(Picture pic) {
@@ -12,9 +13,32 @@ public class Collage {
         pic.cropAndCopy(subpic, 0, 390, 0, 293, 104, 135);
         for (int i = 0; i < 50; i++) {
             subpic = pic.scaleToSize(390, 293);
-            subpic = subpic.rotate(0.2);
+            //subpic = subpic.rotate(0.2);
             pic.cropAndCopy(subpic, 0, 390, 0, 293, 104, 135);
         }
+    }
+
+    /**
+     * Determines if a directory with the inputted name exists in the specified File directory
+     *
+     * @param name      the name of the File to search for.
+     * @param directory the directory in which to search for the File.
+     * @return true if the File exists in the directory.
+     */
+    public static boolean fileExists(String name, File directory) {
+        File returnFile = null;
+        File[] list = directory.listFiles();
+        if (list != null) {
+            for (File fil : list) {
+                if (fil.isDirectory()) {
+                    fileExists(name, fil);
+                } else if (name.equalsIgnoreCase(fil.getName())) {
+                    returnFile = fil.getParentFile();
+                }
+            }
+        }
+
+        return returnFile != null;
     }
 
     /**
@@ -32,9 +56,6 @@ public class Collage {
         pic3 = pic3.rgbEffect(27);
         long endRGB = System.currentTimeMillis();
         System.out.println("rgbEffect created in " + 1.0 * (endRGB - startRGB) / 1000 + " milliseconds.");
-        //pic3.explore();
-
-        //Thread.sleep(Integer.MAX_VALUE);
 
         System.out.println("Scaling and cropping pictures...");
         long startScale = System.currentTimeMillis();
@@ -75,8 +96,19 @@ public class Collage {
         Scanner scan = new Scanner(System.in);
         String filepath = scan.nextLine();
 
-        System.out.println(filepath + File.separator + "collage.jpg");
-        collage.write(filepath + File.separator + "collage.jpg");
+        System.out.println("Saving to: " + filepath + File.separator + "collage.jpg");
 
+        File jpg = new File(filepath + File.separator + "collage.jpg");
+        if (jpg.delete()) {
+
+            collage.write(filepath + File.separator + "collage.jpg");
+
+            if (fileExists("collage.jpg", new File("C:\\Users\\Vivek\\Downloads")))
+                System.out.println("Successfully saved.");
+            else
+                System.out.println("Could not save successfully.");
+        } else {
+            System.out.println("Could not delete previous version of the file. The new file may not be updated.");
+        }
     }
 }
